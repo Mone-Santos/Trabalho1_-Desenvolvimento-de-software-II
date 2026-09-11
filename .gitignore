@@ -1,0 +1,10 @@
+# Dependências do Node.js (não devem ser enviadas para o Git)
+node_modules/
+
+# Ficheiros de ambiente e logs
+.env
+*.log
+
+# Ficheiros do sistema operativo
+.DS_Store
+Thumbs.db

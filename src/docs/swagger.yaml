@@ -1,0 +1,133 @@
+openapi: 3.0.0
+info:
+  title: API da Biblioteca Escolar
+  version: 1.0.0
+  description: Documentação completa da API REST para gestão de livros, estudantes e empréstimos.
+
+servers:
+  - url: http://localhost:3000
+    description: Servidor de Desenvolvimento Local
+
+paths:
+  /api/v1/livros:
+    get:
+      summary: Lista todos os livros
+      description: Retorna livros. Permite filtros (?genero) e paginação (?page&limit).
+      responses:
+        '200':
+          description: Sucesso.
+    post:
+      summary: Cria um novo livro
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titulo: { type: string, example: "1984" }
+                autor: { type: string, example: "George Orwell" }
+                genero: { type: string, example: "Ficção Científica" }
+      responses:
+        '201':
+          description: Criado com sucesso.
+        '400':
+          description: Erro de validação.
+
+  /api/v1/livros/{id}:
+    get:
+      summary: Busca um livro por ID
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Sucesso.
+        '404':
+          description: Livro não encontrado.
+    put:
+      summary: Substitui um livro existente
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                titulo: { type: string }
+                autor: { type: string }
+                genero: { type: string }
+      responses:
+        '200':
+          description: Atualizado com sucesso.
+    delete:
+      summary: Remove um livro
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '204':
+          description: Removido com sucesso.
+
+  /api/v1/estudantes:
+    get:
+      summary: Lista todos os estudantes
+      responses:
+        '200':
+          description: Sucesso.
+    post:
+      summary: Cria um novo estudante
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome: { type: string, example: "Maria Santos" }
+                matricula: { type: string, example: "2023001" }
+      responses:
+        '201':
+          description: Criado com sucesso.
+
+  /api/v1/estudantes/{id}/emprestimos:
+    get:
+      summary: Lista os empréstimos de um estudante (Rota Aninhada)
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema: { type: integer }
+      responses:
+        '200':
+          description: Sucesso.
+
+  /api/v1/emprestimos:
+    get:
+      summary: Lista todos os empréstimos
+      responses:
+        '200':
+          description: Sucesso.
+    post:
+      summary: Regista um novo empréstimo
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                estudanteId: { type: integer, example: 1 }
+                livroId: { type: integer, example: 1 }
+      responses:
+        '201':
+          description: Empréstimo registado.
