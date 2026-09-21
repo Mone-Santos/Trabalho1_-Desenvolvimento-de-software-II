@@ -1,0 +1,84 @@
+// prisma/schema.prisma
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Categoria {
+  id          Int       @id @default(autoincrement())
+  nome        String    @unique
+  descricao   String?
+  deletadoEm  DateTime? @map("deletado_em") // Bónus: Soft Delete
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  livros Livro[]
+
+  @@map("categorias")
+}
+
+model Livro {
+  id              Int       @id @default(autoincrement())
+  titulo          String
+  autor           String
+  totalExemplares Int       @default(1) @map("total_exemplares")
+  disponiveis     Int       @default(1)
+  categoriaId     Int       @map("categoria_id")
+  deletadoEm      DateTime? @map("deletado_em") // Bónus: Soft Delete
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  categoria Categoria        @relation(fields: [categoriaId], references: [id], onDelete: Restrict)
+  itens     ItemEmprestimo[]
+
+  // Bónus: Índices justificadas para otimizar pesquisas por título e categoria
+  @@index([titulo])
+  @@index([categoriaId])
+  @@map("livros")
+}
+
+model Estudante {
+  id         Int       @id @default(autoincrement())
+  nome       String
+  matricula  String    @unique
+  email      String    @unique
+  deletadoEm DateTime? @map("deletado_em") // Bónus: Soft Delete
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+
+  emprestimos Emprestimo[]
+
+  @@index([matricula])
+  @@map("estudantes")
+}
+
+model Emprestimo {
+  id             Int       @id @default(autoincrement())
+  estudanteId    Int       @map("estudante_id")
+  dataEmprestimo DateTime  @default(now()) @map("data_emprestimo")
+  dataDevolucao  DateTime? @map("data_devolucao")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  estudante Estudante        @relation(fields: [estudanteId], references: [id], onDelete: Cascade)
+  itens     ItemEmprestimo[]
+
+  @@map("emprestimos")
+}
+
+model ItemEmprestimo {
+  id           Int      @id @default(autoincrement())
+  emprestimoId Int      @map("emprestimo_id")
+  livroId      Int      @map("livro_id")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  emprestimo Emprestimo @relation(fields: [emprestimoId], references: [id], onDelete: Cascade)
+  livro      Livro      @relation(fields: [livroId], references: [id], onDelete: Restrict)
+
+  @@map("itens_emprestimo")
+}

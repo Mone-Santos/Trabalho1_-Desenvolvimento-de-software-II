@@ -1,10 +1,9 @@
-
+// src/routes/emprestimos.routes.js
 const express = require('express');
 const router = express.Router();
 const emprestimosController = require('../controllers/emprestimos.controller');
+const { validarEmprestimo } = require('../middlewares/validacao.middleware');
 
-// Rotas principais[cite: 1]
-router.get('/', emprestimosController.listarTodos);
-router.post('/', emprestimosController.criar);
+router.post('/', validarEmprestimo, emprestimosController.cadastrar);
 
 module.exports = router;
